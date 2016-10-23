@@ -1,0 +1,18 @@
+#!/bin/bash -eu
+
+if [[ $# -lt 2 ]]; then
+  echo "Usage: ${0##*/} create archive-name [files | directories]" >&2
+  exit 1
+fi
+
+archive_name=${1}
+backup_paths=${@:2}
+
+for f in ${backup_paths[@]}; do
+  if [[ ! -r backups/$f ]]; then
+    echo "File not found: backups/${f}" >&2
+    exit 1
+  fi
+done
+
+docker/tarsnap create "$archive_name" ${backup_paths[@]}

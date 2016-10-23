@@ -1,26 +1,23 @@
 #!/bin/bash -eu
 
-cd ..
+MASTER_KEY=key/tarsnap.key
 
-HOST_MASTER_KEY=key/tarsnap.key
-MASTER_KEY=/$HOST_MASTER_KEY
-WRITE_ONLY_KEY=/tarsnap/write_only.key
 
-if [ ! -f $HOST_MASTER_KEY ]; then
+if [ ! -f $MASTER_KEY ]; then
   echo -n "Enter machine name (`hostname`): "
   read machine_name
 
   echo -n "Enter you tarsnap email address: "
   read email
 
-  docker-compose run --rm tarsnap_rw tarsnap-keygen --keyfile $MASTER_KEY --user $email --machine ${machine_name:-`hostname`}
+  docker/tarsnap keygen "${email}" "${machine_name:-`hostname`}"
   cat <<EOF
 
 *******************************************************************************
 *******************************************************************************
 ** IMPORTANT!
 **
-** Store your ${HOST_MASTER_KEY} somewhere safe.
+** Store your ${MASTER_KEY} somewhere safe.
 ** If you lose tarsnap.key, you will not be able to access your archived data.
 *******************************************************************************
 *******************************************************************************
@@ -28,9 +25,6 @@ if [ ! -f $HOST_MASTER_KEY ]; then
 EOF
 fi
 
-echo -n "Creating write-only key.."
-docker-compose run --rm tarsnap_rw rm -f $WRITE_ONLY_KEY
-echo -n "."
-docker-compose run --rm tarsnap_rw tarsnap-keymgmt --outkeyfile $WRITE_ONLY_KEY -w $MASTER_KEY
-echo -n " "
+echo "Creating write-only key.."
+docker/tarsnap keymgmt-w
 echo "write-only key created!"

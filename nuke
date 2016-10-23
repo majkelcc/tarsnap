@@ -1,0 +1,13 @@
+#!/bin/bash -eu
+
+echo "Listing archives"
+./list-archives
+
+echo -n "Continue? [y/N]: "
+read y
+
+if [[ $y == "y" || $y == "yes" ]]; then
+  docker/tarsnap nuke
+fi
+
+./fsck

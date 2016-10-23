@@ -1,0 +1,74 @@
+#!/usr/bin/env bash -eu
+
+cd ${0%/*}
+cd ..
+
+DOCKER_IMAGE=atmoz/tarsnap
+WRITE_ONLY_KEY=/tarsnap/write_only.key
+CACHE_DIR=/tarsnap/cache
+MASTER_KEY=/key/tarsnap.key
+
+if ! docker volume ls -q | grep -q "^tarsnap$"; then
+  docker volume create --name=tarsnap
+  docker create \
+    --volume tarsnap:/tarsnap \
+    --name tarsnap \
+    $DOCKER_IMAGE
+fi > /dev/null
+
+case $1 in
+create)
+  archive_name=${2:?}
+  backup_paths=${@:3}
+
+  docker run -it --rm --net=host \
+    --volume `pwd`/backups:/backups \
+    --volume tarsnap:/tarsnap \
+    --workdir /backups \
+   $DOCKER_IMAGE \
+    tarsnap \
+      --keyfile $WRITE_ONLY_KEY \
+      --cachedir $CACHE_DIR \
+      -c -f "${archive_name}" ${backup_paths[@]}
+  ;;
+keygen)
+  email=${2:?}
+  machine_name=${3:?}
+
+  docker run -it --rm --net=host \
+    --volume `pwd`/key:/key \
+   $DOCKER_IMAGE \
+   tarsnap-keygen \
+     --keyfile $MASTER_KEY \
+     --user ${email} \
+     --machine ${machine_name}
+  ;;
+keymgmt-w)
+  docker run --rm --net=host \
+    --volume tarsnap:/tarsnap \
+    $DOCKER_IMAGE \
+    rm -f ${WRITE_ONLY_KEY}
+
+  docker run -i --rm --net=host \
+    --volume `pwd`/key:/key \
+    --volume tarsnap:/tarsnap \
+    $DOCKER_IMAGE \
+    tarsnap-keymgmt \
+      --outkeyfile ${WRITE_ONLY_KEY} \
+      -w ${MASTER_KEY}
+  ;;
+fsck|nuke|list-archives)
+  docker run -it --rm --net=host \
+    --volume `pwd`/key:/key \
+    --volume tarsnap:/tarsnap \
+    $DOCKER_IMAGE \
+    tarsnap \
+      --keyfile $MASTER_KEY \
+      --cachedir $CACHE_DIR \
+      --${1}
+  ;;
+*)
+  echo "Unknown command" >&2
+  exit 1
+  ;;
+esac
