@@ -1,0 +1,19 @@
+version: '2'
+services:
+
+  tarsnap_wo:
+    build: .
+    volumes:
+      - tarsnap:/tarsnap
+      - ./backups:/backups
+    working_dir: /backups
+    network_mode: host
+
+  tarsnap_rw:
+    extends:
+      service: tarsnap_wo
+    volumes:
+      - ./key:/key
+
+volumes:
+  tarsnap:
