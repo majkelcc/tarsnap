@@ -1,3 +1,5 @@
 #!/bin/bash -eu
 
+cd ${0%/*}
+
 docker/tarsnap list-archives

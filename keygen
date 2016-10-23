@@ -1,7 +1,8 @@
 #!/bin/bash -eu
 
-MASTER_KEY=key/tarsnap.key
+cd ${0%/*}
 
+MASTER_KEY=key/tarsnap.key
 
 if [ ! -f $MASTER_KEY ]; then
   echo -n "Enter machine name (`hostname`): "

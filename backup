@@ -1,5 +1,7 @@
 #!/bin/bash -eu
 
+cd ${0%/*}
+
 if [[ $# -lt 2 ]]; then
   echo "Usage: ${0##*/} create archive-name [files | directories]" >&2
   exit 1
