@@ -21,7 +21,7 @@ create)
   archive_name=${2:?}
   backup_paths=${@:3}
 
-  docker run -it --rm --net=host \
+  docker run -i $tty_flag --rm --net=host \
     --volume `pwd`/backups:/backups \
     --volume tarsnap:/tarsnap \
     --workdir /backups \
@@ -35,7 +35,7 @@ keygen)
   email=${2:?}
   machine_name=${3:?}
 
-  docker run -it --rm --net=host \
+  docker run -it $tty_flag --rm --net=host \
     --volume `pwd`/key:/key \
    $DOCKER_IMAGE \
    tarsnap-keygen \
@@ -49,7 +49,7 @@ keymgmt-w)
     $DOCKER_IMAGE \
     rm -f ${WRITE_ONLY_KEY}
 
-  docker run -i --rm --net=host \
+  docker run -i $tty_flag --rm --net=host \
     --volume `pwd`/key:/key \
     --volume tarsnap:/tarsnap \
     $DOCKER_IMAGE \
@@ -58,7 +58,7 @@ keymgmt-w)
       -w ${MASTER_KEY}
   ;;
 fsck|nuke|list-archives)
-  docker run -it --rm --net=host \
+  docker run -it $tty_flag --rm --net=host \
     --volume `pwd`/key:/key \
     --volume tarsnap:/tarsnap \
     $DOCKER_IMAGE \
