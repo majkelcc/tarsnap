@@ -50,7 +50,7 @@ restore)
       --keyfile $MASTER_KEY \
       --cachedir $CACHE_DIR \
       -x -f "${archive_name}" ${restore_paths:+"${restore_paths[@]}"}
-   ;;
+    ;;
 keygen)
   email=${2:?}
   machine_name=${3:?}

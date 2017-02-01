@@ -11,3 +11,4 @@ archive_name=${1}
 restore_paths=${@:2}
 
 docker/tarsnap restore "${archive_name}" "${restore_paths[@]}"
+echo "Files successfully restored"
