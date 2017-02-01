@@ -3,7 +3,7 @@
 cd ${0%/*}
 
 if [[ $# -lt 2 ]]; then
-  echo "Usage: ${0##*/} create archive-name [files | directories]" >&2
+  echo "Usage: ${0##*/} archive-name [files | directories]" >&2
   exit 1
 fi
 
@@ -17,4 +17,4 @@ for f in ${backup_paths[@]}; do
   fi
 done
 
-docker/tarsnap create "$archive_name" ${backup_paths[@]}
+docker/tarsnap create "$archive_name" "${backup_paths[@]}"

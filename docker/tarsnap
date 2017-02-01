@@ -29,8 +29,28 @@ create)
     tarsnap \
       --keyfile $WRITE_ONLY_KEY \
       --cachedir $CACHE_DIR \
-      -c -f "${archive_name}" ${backup_paths[@]}
+      -c -f "${archive_name}" ${backup_paths:+"${backup_paths[@]}"}
   ;;
+restore)
+  archive_name=${2:?}
+  restore_paths=${@:3}
+
+  if [[ ! -f $MASTER_KEY ]]; then
+    echo "To restore files you need to put your master key into `pwd`${MASTER_KEY} path" >&2
+    exit 1
+  fi
+
+  docker run -i --rm --net=host \
+    --volume `pwd`/restored:/restored \
+    --volume tarsnap:/tarsnap \
+    --volume `pwd`/key:/key:ro \
+    --workdir /restored \
+   $DOCKER_IMAGE \
+    tarsnap \
+      --keyfile $MASTER_KEY \
+      --cachedir $CACHE_DIR \
+      -x -f "${archive_name}" ${restore_paths:+"${restore_paths[@]}"}
+   ;;
 keygen)
   email=${2:?}
   machine_name=${3:?}
