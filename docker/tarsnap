@@ -35,8 +35,8 @@ restore)
   archive_name=${2:?}
   restore_paths=${@:3}
 
-  if [[ ! -f $MASTER_KEY ]]; then
-    echo "To restore files you need to put your master key into `pwd`${MASTER_KEY} path" >&2
+  if [[ ! -f "$(pwd)${MASTER_KEY}" ]]; then
+    echo "To restore files you need to put your master key into ${PWD/${HOME}/~}${MASTER_KEY}" >&2
     exit 1
   fi
 
